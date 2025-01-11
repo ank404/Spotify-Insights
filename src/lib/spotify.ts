@@ -1,9 +1,12 @@
 // Spotify API configuration and utility functions
-const CLIENT_ID = "99d4093625df4103b288148d0a2007ab"; // Updated Client ID
-const REDIRECT_URI = "http://localhost:8080/callback"; // Updated with /callback endpoint
+const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
+const REDIRECT_URI = import.meta.env.VITE_SPOTIFY_REDIRECT_URI;
 const SCOPES = [
   "user-read-private",
   "user-read-email",
+  "user-read-playback-state",
+  "user-modify-playback-state",
+  "user-read-currently-playing",
   "user-top-read",
   "user-library-read",
 ].join(" ");
