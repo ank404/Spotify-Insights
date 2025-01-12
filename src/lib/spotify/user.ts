@@ -45,7 +45,7 @@ export const fetchTopAlbums = async (token: string, timeRange: string = "medium_
   return uniqueAlbums;
 };
 
-export const fetchSavedTracks = async (token: string, limit: number = 20, offset: number = 0) => {
+export const fetchSavedTracks = async (token: string, limit: number = 50, offset: number = 0) => {
   const response = await fetch(
     `${BASE_URL}/me/tracks?limit=${limit}&offset=${offset}`,
     {

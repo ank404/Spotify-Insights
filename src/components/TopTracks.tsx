@@ -76,7 +76,7 @@ const TopTracks = ({ tracks }: TopTracksProps) => {
       {tracks.map((track, index) => (
         <div
           key={track.id}
-          className="bg-white dark:bg-spotify-black p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-spotify-lightgray transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl"
+          className="bg-card shadow-md dark:hover:bg-spotify-lightgray group animate-fade-in p-4 rounded-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl"
         >
           <div className="relative group">
             <img

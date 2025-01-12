@@ -44,7 +44,7 @@ const SavedTracks = () => {
       {savedTracks?.items.map((item: any) => (
         <div
           key={item.track.id}
-          className="bg-card p-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 group animate-fade-in"
+          className="bg-card shadow-md dark:hover:bg-spotify-lightgray group animate-fade-in p-4 rounded-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl"
         >
           <div className="flex items-center gap-4">
             <img
