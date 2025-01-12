@@ -23,7 +23,7 @@ const TopArtists = ({ artists }: TopArtistsProps) => {
       {artists.map((artist, index) => (
         <div
           key={artist.id}
-          className="bg-spotify-darkgray p-4 rounded-lg hover:bg-spotify-lightgray transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl"
+          className="bg-white dark:bg-spotify-black p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-spotify-lightgray transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl"
         >
           <div className="relative">
             <img
@@ -47,11 +47,11 @@ const TopArtists = ({ artists }: TopArtistsProps) => {
             )}
           </div>
           <div className="mt-4 text-center">
-            <span className="text-2xl font-bold text-white">#{index + 1}</span>
-            <h3 className="text-lg font-semibold text-white mt-2 truncate">
+            <span className="text-2xl font-bold text-black dark:text-white">#{index + 1}</span>
+            <h3 className="text-lg font-semibold text-black dark:text-white mt-2 truncate">
               {artist.name}
             </h3>
-            <p className="text-gray-400 text-sm mt-1 truncate">
+            <p className="text-gray-700 dark:text-gray-400 text-sm mt-1 truncate">
               {artist.genres.slice(0, 2).join(", ")}
             </p>
           </div>

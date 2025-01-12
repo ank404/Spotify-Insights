@@ -76,7 +76,7 @@ const TopTracks = ({ tracks }: TopTracksProps) => {
       {tracks.map((track, index) => (
         <div
           key={track.id}
-          className="bg-spotify-darkgray p-4 rounded-lg hover:bg-spotify-lightgray transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl"
+          className="bg-white dark:bg-spotify-black p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-spotify-lightgray transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl"
         >
           <div className="relative group">
             <img
@@ -115,11 +115,11 @@ const TopTracks = ({ tracks }: TopTracksProps) => {
             )}
           </div>
           <div className="mt-4">
-            <span className="text-2xl font-bold text-white">#{index + 1}</span>
-            <h3 className="text-lg font-semibold text-white mt-2 truncate">
+            <span className="text-2xl font-bold text-black dark:text-white">#{index + 1}</span>
+            <h3 className="text-lg font-semibold text-black dark:text-white mt-2 truncate">
               {track.name}
             </h3>
-            <p className="text-gray-400 truncate">
+            <p className="text-gray-700 dark:text-gray-400 truncate">
               {track.artists.map(a => a.name).join(", ")}
             </p>
           </div>
