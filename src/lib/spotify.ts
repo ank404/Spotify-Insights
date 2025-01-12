@@ -78,3 +78,37 @@ export const fetchTopArtists = async (token: string, timeRange: string = "medium
   if (!response.ok) throw new Error("Failed to fetch top artists");
   return response.json();
 };
+
+export const fetchCurrentlyPlaying = async (token: string) => {
+  const response = await fetch(`${BASE_URL}/me/player`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error("Failed to fetch currently playing");
+  return response.json();
+};
+
+export const fetchTopAlbums = async (token: string, timeRange: string = "medium_term") => {
+  const response = await fetch(
+    `${BASE_URL}/me/top/tracks?limit=20&time_range=${timeRange}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  if (!response.ok) throw new Error("Failed to fetch top albums");
+  const data = await response.json();
+  // Extract unique albums from top tracks
+  const uniqueAlbums = Array.from(
+    new Map(data.items.map((track: any) => [track.album.id, track.album])).values()
+  ).slice(0, 10);
+  return uniqueAlbums;
+};
+
+export const controlPlayback = async (token: string, action: string) => {
+  const endpoint = `${BASE_URL}/me/player/${action}`;
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error(`Failed to ${action} playback`);
+  return response.status === 204;
+};
