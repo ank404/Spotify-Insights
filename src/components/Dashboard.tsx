@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchTopTracks, fetchTopArtists, fetchUserProfile, fetchCurrentlyPlaying, fetchTopAlbums, fetchSavedTracks, controlPlayback } from "@/lib/spotify";
+import { fetchTopTracks, fetchTopArtists, fetchUserProfile, fetchCurrentlyPlaying, fetchTopAlbums, controlPlayback } from "@/lib/spotify";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
