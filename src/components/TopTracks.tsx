@@ -7,6 +7,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Progress } from "@/components/ui/progress";
+import { controlPlayback } from "@/lib/spotify/playback";
+import { useToast } from "@/hooks/use-toast";
 
 interface Track {
   id: string;
@@ -15,7 +17,7 @@ interface Track {
   album: {
     images: Array<{ url: string }>;
   };
-  preview_url: string | null;
+  uri: string;
 }
 
 interface TopTracksProps {
@@ -23,51 +25,29 @@ interface TopTracksProps {
 }
 
 const TopTracks = ({ tracks }: TopTracksProps) => {
-  const [playing, setPlaying] = useState<string | null>(null);
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+  const { toast } = useToast();
+  const token = localStorage.getItem("spotify_token");
+  const [playingTrackId, setPlayingTrackId] = useState<string | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
-  const [progress, setProgress] = useState(0);
 
-  const handlePlay = async (previewUrl: string | null, trackId: string) => {
-    if (!previewUrl) return;
-
-    if (playing === trackId) {
-      audio?.pause();
-      setPlaying(null);
-      setAudio(null);
-      setProgress(0);
-    } else {
-      if (audio) {
-        audio.pause();
-      }
-      setLoading(trackId);
-      const newAudio = new Audio(previewUrl);
-      
-      newAudio.addEventListener('timeupdate', () => {
-        const percentage = (newAudio.currentTime / newAudio.duration) * 100;
-        setProgress(percentage);
-      });
-
-      newAudio.addEventListener('canplaythrough', () => {
-        setLoading(null);
-        newAudio.play();
-        setPlaying(trackId);
-        setAudio(newAudio);
-      });
-
-      newAudio.addEventListener('ended', () => {
-        setPlaying(null);
-        setAudio(null);
-        setProgress(0);
-      });
-
-      // Start loading the audio
-      try {
-        await newAudio.load();
-      } catch (error) {
-        console.error('Error loading audio:', error);
+  const handlePlayPause = async (trackId: string, trackUri: string) => {
+    try {
+      if (playingTrackId === trackId) {
+        await controlPlayback(token!, "pause");
+        setPlayingTrackId(null);
+      } else {
+        setLoading(trackId);
+        await controlPlayback(token!, "play", trackUri);
+        setPlayingTrackId(trackId);
         setLoading(null);
       }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to control playback. Make sure Spotify is active.",
+        variant: "destructive",
+      });
+      setLoading(null);
     }
   };
 
@@ -84,35 +64,28 @@ const TopTracks = ({ tracks }: TopTracksProps) => {
               alt={track.name}
               className="w-full aspect-square object-cover rounded-md"
             />
-            {track.preview_url && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      onClick={() => handlePlay(track.preview_url, track.id)}
-                      className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-md"
-                      disabled={loading === track.id}
-                    >
-                      {loading === track.id ? (
-                        <Loader2 className="w-12 h-12 text-white animate-spin" />
-                      ) : playing === track.id ? (
-                        <Pause className="w-12 h-12 text-white" />
-                      ) : (
-                        <Play className="w-12 h-12 text-white" />
-                      )}
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{playing === track.id ? 'Pause' : 'Play Preview'}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-            {playing === track.id && (
-              <div className="absolute bottom-0 left-0 right-0 p-2">
-                <Progress value={progress} className="h-1 bg-white/20" />
-              </div>
-            )}
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => handlePlayPause(track.id, track.uri)}
+                    className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-md"
+                    disabled={loading === track.id}
+                  >
+                    {loading === track.id ? (
+                      <Loader2 className="w-12 h-12 text-white animate-spin" />
+                    ) : playingTrackId === track.id ? (
+                      <Pause className="w-12 h-12 text-white" />
+                    ) : (
+                      <Play className="w-12 h-12 text-white" />
+                    )}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{playingTrackId === track.id ? 'Pause' : 'Play'}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
           <div className="mt-4">
             <span className="text-2xl font-bold text-black dark:text-white">#{index + 1}</span>
