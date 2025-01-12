@@ -17,13 +17,13 @@ const SavedTracks = () => {
     enabled: !!token,
   });
 
-  const handlePlayPause = async (trackId: string) => {
+  const handlePlayPause = async (trackId: string, trackUri: string) => {
     try {
       if (playingTrackId === trackId) {
         await controlPlayback(token!, "pause");
         setPlayingTrackId(null);
       } else {
-        await controlPlayback(token!, "play");
+        await controlPlayback(token!, "play", trackUri);
         setPlayingTrackId(trackId);
       }
     } catch (error) {
@@ -61,7 +61,7 @@ const SavedTracks = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handlePlayPause(item.track.id)}
+              onClick={() => handlePlayPause(item.track.id, item.track.uri)}
               className="opacity-0 group-hover:opacity-100 transition-opacity"
             >
               {playingTrackId === item.track.id ? (
