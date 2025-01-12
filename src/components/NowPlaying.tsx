@@ -1,31 +1,15 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchCurrentlyPlaying, controlPlayback, setVolume, fetchQueue } from "@/lib/spotify";
+import { fetchCurrentlyPlaying, fetchQueue } from "@/lib/spotify";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import { useToast } from "@/hooks/use-toast";
-import { Play, Pause, SkipBack, SkipForward, Music, Volume2 } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Music } from "lucide-react";
+import PlaybackControls from "./PlaybackControls";
+import VolumeControl from "./VolumeControl";
+import QueueDisplay from "./QueueDisplay";
 
 const NowPlaying = () => {
-  const { toast } = useToast();
   const token = localStorage.getItem("spotify_token");
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolumeState] = useState(50);
-  const [isAdjustingVolume, setIsAdjustingVolume] = useState(false);
 
   const { data: currentTrack, refetch } = useQuery({
     queryKey: ["currently-playing"],
@@ -47,46 +31,6 @@ const NowPlaying = () => {
     }
   }, [currentTrack]);
 
-  const handlePlaybackControl = async (action: string) => {
-    if (!token) return;
-    try {
-      await controlPlayback(token, action);
-      refetch();
-      toast({
-        title: "Success",
-        description: `Playback ${action} successful`,
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to control playback. Make sure Spotify is active.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleVolumeChange = async (value: number[]) => {
-    if (!token || isAdjustingVolume) return;
-    setVolumeState(value[0]);
-    setIsAdjustingVolume(true);
-    
-    try {
-      await setVolume(token, value[0]);
-      toast({
-        title: "Success",
-        description: "Volume updated",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update volume",
-        variant: "destructive",
-      });
-    } finally {
-      setIsAdjustingVolume(false);
-    }
-  };
-
   if (!currentTrack) {
     return (
       <div className="bg-card p-4 rounded-lg shadow-lg animate-fade-in">
@@ -99,117 +43,33 @@ const NowPlaying = () => {
   }
 
   return (
-    <div className="bg-card p-4 rounded-lg shadow-lg animate-fade-in">
-      <div className="flex items-center gap-4">
-        {currentTrack.item?.album?.images?.[0] && (
-          <img
-            src={currentTrack.item.album.images[0].url}
-            alt="Album art"
-            className="w-16 h-16 rounded-md"
-          />
-        )}
-        <div className="flex-1">
-          <h3 className="font-semibold truncate">{currentTrack.item?.name}</h3>
-          <p className="text-sm text-muted-foreground truncate">
-            {currentTrack.item?.artists?.map((a: any) => a.name).join(", ")}
-          </p>
-        </div>
-        
+    <div className="space-y-2 animate-fade-in">
+      <h2 className="text-xl font-semibold bg-gradient-to-r from-spotify-green to-blue-400 bg-clip-text text-transparent animate-pulse">
+        Your currently playing track on {currentTrack?.device?.name || "Spotify"}
+      </h2>
+      <div className="bg-gradient-to-r from-spotify-black to-spotify-darkgray p-4 rounded-lg shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02] border border-spotify-lightgray">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Volume2 className="w-4 h-4" />
-            <Slider
-              value={[volume]}
-              min={0}
-              max={100}
-              step={1}
-              className="w-24"
-              onValueChange={handleVolumeChange}
+          {currentTrack.item?.album?.images?.[0] && (
+            <img
+              src={currentTrack.item.album.images[0].url}
+              alt="Album art"
+              className="w-16 h-16 rounded-md animate-fade-in"
             />
+          )}
+          <div className="flex-1">
+            <h3 className="font-semibold truncate animate-fade-in">
+              {currentTrack.item?.name}
+            </h3>
+            <p className="text-sm text-muted-foreground truncate">
+              {currentTrack.item?.artists?.map((a: any) => a.name).join(", ")}
+            </p>
           </div>
-
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="sm">
-                Queue
-              </Button>
-            </SheetTrigger>
-            <SheetContent>
-              <SheetHeader>
-                <SheetTitle>Up Next</SheetTitle>
-                <SheetDescription>
-                  Songs in your queue
-                </SheetDescription>
-              </SheetHeader>
-              <div className="mt-4 space-y-4">
-                {queueData?.queue?.map((track: any, index: number) => (
-                  <div key={index} className="flex items-center gap-2">
-                    {track.album?.images?.[2] && (
-                      <img
-                        src={track.album.images[2].url}
-                        alt="Album art"
-                        className="w-10 h-10 rounded"
-                      />
-                    )}
-                    <div>
-                      <p className="font-medium">{track.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {track.artists?.map((a: any) => a.name).join(", ")}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </SheetContent>
-          </Sheet>
-
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handlePlaybackControl("previous")}
-                  className="hover:scale-110 transition-transform"
-                >
-                  <SkipBack className="w-5 h-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Previous track</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handlePlaybackControl(isPlaying ? "pause" : "play")}
-                  className="hover:scale-110 transition-transform"
-                >
-                  {isPlaying ? (
-                    <Pause className="w-5 h-5" />
-                  ) : (
-                    <Play className="w-5 h-5" />
-                  )}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>{isPlaying ? "Pause" : "Play"}</TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handlePlaybackControl("next")}
-                  className="hover:scale-110 transition-transform"
-                >
-                  <SkipForward className="w-5 h-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Next track</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          
+          <div className="flex items-center gap-4">
+            <VolumeControl initialVolume={50} />
+            <QueueDisplay queue={queueData?.queue || []} />
+            <PlaybackControls isPlaying={isPlaying} onPlaybackChange={refetch} />
+          </div>
         </div>
       </div>
     </div>

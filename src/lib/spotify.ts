@@ -117,15 +117,27 @@ export const controlPlayback = async (token: string, action: string) => {
   if (!activeDevice) throw new Error('No active device found');
   
   const deviceId = activeDevice.id;
-  const endpoint = `${BASE_URL}/me/player/${action}`;
+  let endpoint = `${BASE_URL}/me/player/${action}`;
+  let method = 'POST';
   
-  // Add device_id as query parameter for play/pause actions
-  const url = action === 'play' || action === 'pause' 
-    ? `${endpoint}?device_id=${deviceId}`
-    : endpoint;
+  // Handle different actions
+  switch (action) {
+    case 'play':
+    case 'pause':
+      endpoint = `${BASE_URL}/me/player/${action}?device_id=${deviceId}`;
+      method = 'PUT';
+      break;
+    case 'next':
+    case 'previous':
+      endpoint = `${BASE_URL}/me/player/${action}`;
+      method = 'POST';
+      break;
+    default:
+      throw new Error(`Invalid action: ${action}`);
+  }
 
-  const response = await fetch(url, {
-    method: 'PUT',
+  const response = await fetch(endpoint, {
+    method,
     headers: { Authorization: `Bearer ${token}` },
   });
   
