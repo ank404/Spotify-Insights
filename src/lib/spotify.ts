@@ -104,11 +104,50 @@ export const fetchTopAlbums = async (token: string, timeRange: string = "medium_
 };
 
 export const controlPlayback = async (token: string, action: string) => {
-  const endpoint = `${BASE_URL}/me/player/${action}`;
-  const response = await fetch(endpoint, {
-    method: 'POST',
+  // First get the active device
+  const deviceResponse = await fetch(`${BASE_URL}/me/player/devices`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (!response.ok) throw new Error(`Failed to ${action} playback`);
+  
+  if (!deviceResponse.ok) throw new Error('Failed to fetch devices');
+  const devices = await deviceResponse.json();
+  
+  // Get the active device ID
+  const activeDevice = devices.devices.find((d: any) => d.is_active) || devices.devices[0];
+  if (!activeDevice) throw new Error('No active device found');
+  
+  const deviceId = activeDevice.id;
+  const endpoint = `${BASE_URL}/me/player/${action}`;
+  
+  // Add device_id as query parameter for play/pause actions
+  const url = action === 'play' || action === 'pause' 
+    ? `${endpoint}?device_id=${deviceId}`
+    : endpoint;
+
+  const response = await fetch(url, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  
+  if (!response.ok && response.status !== 204) {
+    throw new Error(`Failed to ${action} playback`);
+  }
   return response.status === 204;
+};
+
+export const setVolume = async (token: string, volumePercent: number) => {
+  const response = await fetch(`${BASE_URL}/me/player/volume?volume_percent=${volumePercent}`, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error('Failed to set volume');
+  return response.status === 204;
+};
+
+export const fetchQueue = async (token: string) => {
+  const response = await fetch(`${BASE_URL}/me/player/queue`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error('Failed to fetch queue');
+  return response.json();
 };

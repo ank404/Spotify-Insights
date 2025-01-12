@@ -1,26 +1,44 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchCurrentlyPlaying, controlPlayback } from "@/lib/spotify";
+import { fetchCurrentlyPlaying, controlPlayback, setVolume, fetchQueue } from "@/lib/spotify";
 import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
-import { Play, Pause, SkipBack, SkipForward, Music } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Music, Volume2 } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 const NowPlaying = () => {
   const { toast } = useToast();
   const token = localStorage.getItem("spotify_token");
   const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolumeState] = useState(50);
+  const [isAdjustingVolume, setIsAdjustingVolume] = useState(false);
 
   const { data: currentTrack, refetch } = useQuery({
     queryKey: ["currently-playing"],
     queryFn: () => fetchCurrentlyPlaying(token!),
     enabled: !!token,
     refetchInterval: 5000,
+  });
+
+  const { data: queueData } = useQuery({
+    queryKey: ["queue"],
+    queryFn: () => fetchQueue(token!),
+    enabled: !!token,
+    refetchInterval: 10000,
   });
 
   useEffect(() => {
@@ -44,6 +62,28 @@ const NowPlaying = () => {
         description: "Failed to control playback. Make sure Spotify is active.",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleVolumeChange = async (value: number[]) => {
+    if (!token || isAdjustingVolume) return;
+    setVolumeState(value[0]);
+    setIsAdjustingVolume(true);
+    
+    try {
+      await setVolume(token, value[0]);
+      toast({
+        title: "Success",
+        description: "Volume updated",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update volume",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAdjustingVolume(false);
     }
   };
 
@@ -74,7 +114,55 @@ const NowPlaying = () => {
             {currentTrack.item?.artists?.map((a: any) => a.name).join(", ")}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Volume2 className="w-4 h-4" />
+            <Slider
+              value={[volume]}
+              min={0}
+              max={100}
+              step={1}
+              className="w-24"
+              onValueChange={handleVolumeChange}
+            />
+          </div>
+
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="sm">
+                Queue
+              </Button>
+            </SheetTrigger>
+            <SheetContent>
+              <SheetHeader>
+                <SheetTitle>Up Next</SheetTitle>
+                <SheetDescription>
+                  Songs in your queue
+                </SheetDescription>
+              </SheetHeader>
+              <div className="mt-4 space-y-4">
+                {queueData?.queue?.map((track: any, index: number) => (
+                  <div key={index} className="flex items-center gap-2">
+                    {track.album?.images?.[2] && (
+                      <img
+                        src={track.album.images[2].url}
+                        alt="Album art"
+                        className="w-10 h-10 rounded"
+                      />
+                    )}
+                    <div>
+                      <p className="font-medium">{track.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {track.artists?.map((a: any) => a.name).join(", ")}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </SheetContent>
+          </Sheet>
+
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
