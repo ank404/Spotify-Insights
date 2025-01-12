@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getTokenFromUrl } from "@/lib/spotify";
+import { getTokenFromUrl } from "@/lib/spotify/auth";
 import { useToast } from "@/hooks/use-toast";
 
 const Callback = () => {
@@ -8,35 +8,22 @@ const Callback = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const handleCallback = () => {
-      const { access_token, state } = getTokenFromUrl();
-      const storedState = localStorage.getItem("spotify_auth_state");
+    const { access_token, token_type, expires_in, state } = getTokenFromUrl();
 
-      if (!access_token || state !== storedState) {
-        toast({
-          title: "Authentication Error",
-          description: "Failed to log in with Spotify. Please try again.",
-          variant: "destructive",
-        });
-        navigate("/");
-        return;
-      }
-
+    if (access_token) {
       localStorage.setItem("spotify_token", access_token);
-      localStorage.removeItem("spotify_auth_state");
       navigate("/dashboard");
-    };
-
-    handleCallback();
+    } else {
+      toast({
+        title: "Authentication Error",
+        description: "Failed to authenticate with Spotify. Please try again.",
+        variant: "destructive",
+      });
+      navigate("/");
+    }
   }, [navigate, toast]);
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-spotify-black">
-      <div className="animate-pulse text-spotify-green text-xl">
-        Logging you in...
-      </div>
-    </div>
-  );
+  return null;
 };
 
 export default Callback;

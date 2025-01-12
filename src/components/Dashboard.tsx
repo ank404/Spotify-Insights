@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchTopTracks, fetchTopArtists, fetchUserProfile, fetchCurrentlyPlaying, fetchTopAlbums, controlPlayback } from "@/lib/spotify";
+import { fetchTopTracks, fetchTopArtists, fetchUserProfile, fetchCurrentlyPlaying, fetchTopAlbums, fetchSavedTracks, controlPlayback } from "@/lib/spotify";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
@@ -10,6 +10,7 @@ import TopArtists from "./TopArtists";
 import { ThemeToggle } from "./ThemeToggle";
 import NowPlaying from "./NowPlaying";
 import TopAlbums from "./TopAlbums";
+import SavedTracks from "./SavedTracks";
 import {
   Tooltip,
   TooltipContent,
@@ -159,6 +160,13 @@ const Dashboard = () => {
               <Album className="w-4 h-4 mr-2" />
               Top Albums
             </TabsTrigger>
+            <TabsTrigger
+              value="saved"
+              className="data-[state=active]:bg-spotify-green transition-all duration-300"
+            >
+              <Music className="w-4 h-4 mr-2" />
+              Saved Tracks
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="tracks" className="space-y-4 focus-visible:outline-none">
@@ -194,6 +202,18 @@ const Dashboard = () => {
               </div>
             ) : (
               <TopAlbums timeRange={timeRange} />
+            )}
+          </TabsContent>
+
+          <TabsContent value="saved" className="space-y-4 focus-visible:outline-none">
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin text-spotify-green text-xl">
+                  <Music className="w-8 h-8" />
+                </div>
+              </div>
+            ) : (
+              <SavedTracks />
             )}
           </TabsContent>
         </Tabs>
