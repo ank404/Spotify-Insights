@@ -30,7 +30,7 @@ Spotify Session Dashboard is a web application that provides users with insights
 1. Clone the repository:
 
 ```sh
-git clone https://github.com/yourusername/spotify-session-dashboard.git
+git clone https://github.com/ank404/spotify-session-dashboard.git
 cd spotify-session-dashboard
 ```
 
