@@ -54,6 +54,11 @@ const Dashboard = () => {
     fetchData();
   }, [navigate, toast]);
 
+  const handleLogout = () => {
+    localStorage.removeItem("spotify_token");
+    navigate("/");
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background transition-colors duration-500">
