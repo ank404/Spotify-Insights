@@ -13,6 +13,7 @@ import DashboardHeader from "./dashboard/DashboardHeader";
 import TimeRangeSelector from "./dashboard/TimeRangeSelector";
 import UserAnalytics from "./analytics/UserAnalytics";
 import MusicRecommendations from "./recommendations/MusicRecommendations";
+import TotalListeningTime from "./analytics/TotalListeningTime";
 
 const timeRanges = [
   { value: "short_term", label: "Last 3 Months" },
@@ -73,6 +74,7 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background text-foreground p-4 md:p-8 transition-colors duration-500">
       <div className="max-w-7xl mx-auto space-y-8 animate-fade-in">
         <DashboardHeader userName={user?.display_name} onLogout={handleLogout} />
+        <TotalListeningTime />
         <NowPlaying />
         <TimeRangeSelector
           timeRanges={timeRanges}

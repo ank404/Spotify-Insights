@@ -1,7 +1,7 @@
 const BASE_URL = "https://api.spotify.com/v1";
 
-export const fetchUserListeningHistory = async (token: string) => {
-  const response = await fetch(`${BASE_URL}/me/player/recently-played`, {
+export const fetchUserListeningHistory = async (token: string, limit: number = 50) => {
+  const response = await fetch(`${BASE_URL}/me/player/recently-played?limit=${limit}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!response.ok) throw new Error("Failed to fetch listening history");
