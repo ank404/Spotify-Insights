@@ -40,9 +40,11 @@ const Dashboard = () => {
         const userData = await fetchUserProfile(token);
         setUser(userData);
       } catch (error) {
+        // Clear token and redirect to login if the request fails
+        localStorage.removeItem("spotify_token");
         toast({
-          title: "Error",
-          description: "Failed to fetch data. Please try logging in again.",
+          title: "Session Expired",
+          description: "Your session has expired. Please login again.",
           variant: "destructive",
         });
         navigate("/");

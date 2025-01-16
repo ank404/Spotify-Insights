@@ -7,7 +7,14 @@ import LoginPage from "./components/LoginPage";
 import Callback from "./components/Callback";
 import Dashboard from "./components/Dashboard";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => {
   return (
