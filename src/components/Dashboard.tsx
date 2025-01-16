@@ -12,9 +12,7 @@ import NowPlaying from "./NowPlaying";
 import DashboardHeader from "./dashboard/DashboardHeader";
 import TimeRangeSelector from "./dashboard/TimeRangeSelector";
 import UserAnalytics from "./analytics/UserAnalytics";
-import LyricsDisplay from "./lyrics/LyricsDisplay";
 import MusicRecommendations from "./recommendations/MusicRecommendations";
-import MusicVisualizer from "./visualizer/MusicVisualizer";
 
 const timeRanges = [
   { value: "short_term", label: "Last 3 Months" },
@@ -55,11 +53,6 @@ const Dashboard = () => {
 
     fetchData();
   }, [navigate, toast]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("spotify_token");
-    navigate("/");
-  };
 
   if (loading) {
     return (
@@ -121,7 +114,6 @@ const Dashboard = () => {
 
           <TabsContent value="tracks" className="space-y-4 focus-visible:outline-none">
             <TopTracks timeRange={timeRange} />
-            <LyricsDisplay trackName="Current Track" artistName="Current Artist" />
           </TabsContent>
 
           <TabsContent value="artists" className="space-y-4 focus-visible:outline-none">
@@ -138,7 +130,6 @@ const Dashboard = () => {
 
           <TabsContent value="analytics" className="space-y-4 focus-visible:outline-none">
             <UserAnalytics />
-            <MusicVisualizer />
             <MusicRecommendations />
           </TabsContent>
         </Tabs>
