@@ -6,9 +6,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Progress } from "@/components/ui/progress";
 import { controlPlayback } from "@/lib/spotify/playback";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
+import { fetchTopTracks } from "@/lib/spotify/user";
 
 interface Track {
   id: string;
@@ -21,14 +22,22 @@ interface Track {
 }
 
 interface TopTracksProps {
-  tracks: Track[];
+  timeRange: string;
 }
 
-const TopTracks = ({ tracks }: TopTracksProps) => {
+const TopTracks = ({ timeRange }: TopTracksProps) => {
   const { toast } = useToast();
   const token = localStorage.getItem("spotify_token");
   const [playingTrackId, setPlayingTrackId] = useState<string | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
+
+  const { data: tracksData } = useQuery({
+    queryKey: ["top-tracks", timeRange],
+    queryFn: () => fetchTopTracks(token!, timeRange),
+    enabled: !!token,
+  });
+
+  const tracks = tracksData?.items || [];
 
   const handlePlayPause = async (trackId: string, trackUri: string) => {
     try {

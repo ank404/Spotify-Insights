@@ -5,6 +5,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useQuery } from "@tanstack/react-query";
+import { fetchTopArtists } from "@/lib/spotify/user";
 
 interface Artist {
   id: string;
@@ -14,10 +16,20 @@ interface Artist {
 }
 
 interface TopArtistsProps {
-  artists: Artist[];
+  timeRange: string;
 }
 
-const TopArtists = ({ artists }: TopArtistsProps) => {
+const TopArtists = ({ timeRange }: TopArtistsProps) => {
+  const token = localStorage.getItem("spotify_token");
+  
+  const { data: artistsData } = useQuery({
+    queryKey: ["top-artists", timeRange],
+    queryFn: () => fetchTopArtists(token!, timeRange),
+    enabled: !!token,
+  });
+
+  const artists = artistsData?.items || [];
+
   return (
     <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 animate-fade-in">
       {artists.map((artist, index) => (
