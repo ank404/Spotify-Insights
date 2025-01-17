@@ -41,7 +41,6 @@ const Dashboard = () => {
         const userData = await fetchUserProfile(token);
         setUser(userData);
       } catch (error) {
-        // Clear token and redirect to login if the request fails
         localStorage.removeItem("spotify_token");
         toast({
           title: "Session Expired",
@@ -83,34 +82,34 @@ const Dashboard = () => {
         />
 
         <Tabs defaultValue="tracks" className="space-y-6">
-          <TabsList className="bg-card w-full justify-start">
+          <TabsList className="bg-card w-full justify-start flex-wrap h-auto gap-2 p-2">
             <TabsTrigger
               value="tracks"
               className="data-[state=active]:bg-spotify-green transition-all duration-300"
             >
               <Music className="w-4 h-4 mr-2" />
-              Top Tracks
+              <span className="hidden sm:inline">Top</span> Tracks
             </TabsTrigger>
             <TabsTrigger
               value="artists"
               className="data-[state=active]:bg-spotify-green transition-all duration-300"
             >
               <User className="w-4 h-4 mr-2" />
-              Top Artists
+              <span className="hidden sm:inline">Top</span> Artists
             </TabsTrigger>
             <TabsTrigger
               value="albums"
               className="data-[state=active]:bg-spotify-green transition-all duration-300"
             >
               <Album className="w-4 h-4 mr-2" />
-              Top Albums
+              <span className="hidden sm:inline">Top</span> Albums
             </TabsTrigger>
             <TabsTrigger
               value="saved"
               className="data-[state=active]:bg-spotify-green transition-all duration-300"
             >
               <Music className="w-4 h-4 mr-2" />
-              Saved Tracks
+              Saved
             </TabsTrigger>
             <TabsTrigger
               value="analytics"
