@@ -1,19 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchUserProfile } from "@/lib/spotify/user";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Music, User, Album } from "lucide-react";
-import TopTracks from "./TopTracks";
-import TopArtists from "./TopArtists";
-import TopAlbums from "./TopAlbums";
-import SavedTracks from "./SavedTracks";
 import NowPlaying from "./NowPlaying";
 import DashboardHeader from "./dashboard/DashboardHeader";
 import TimeRangeSelector from "./dashboard/TimeRangeSelector";
-import UserAnalytics from "./analytics/UserAnalytics";
-import MusicRecommendations from "./recommendations/MusicRecommendations";
 import TotalListeningTime from "./analytics/TotalListeningTime";
+import DashboardContent from "./dashboard/DashboardContent";
 
 const timeRanges = [
   { value: "short_term", label: "Last 3 Months" },
@@ -80,67 +73,7 @@ const Dashboard = () => {
           selectedRange={timeRange}
           onRangeChange={setTimeRange}
         />
-
-        <Tabs defaultValue="tracks" className="space-y-6">
-          <TabsList className="bg-card w-full justify-start flex-wrap h-auto gap-2 p-2">
-            <TabsTrigger
-              value="tracks"
-              className="data-[state=active]:bg-spotify-green transition-all duration-300"
-            >
-              <Music className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Top</span> Tracks
-            </TabsTrigger>
-            <TabsTrigger
-              value="artists"
-              className="data-[state=active]:bg-spotify-green transition-all duration-300"
-            >
-              <User className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Top</span> Artists
-            </TabsTrigger>
-            <TabsTrigger
-              value="albums"
-              className="data-[state=active]:bg-spotify-green transition-all duration-300"
-            >
-              <Album className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Top</span> Albums
-            </TabsTrigger>
-            <TabsTrigger
-              value="saved"
-              className="data-[state=active]:bg-spotify-green transition-all duration-300"
-            >
-              <Music className="w-4 h-4 mr-2" />
-              Saved
-            </TabsTrigger>
-            <TabsTrigger
-              value="analytics"
-              className="data-[state=active]:bg-spotify-green transition-all duration-300"
-            >
-              <User className="w-4 h-4 mr-2" />
-              Analytics
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="tracks" className="space-y-4 focus-visible:outline-none">
-            <TopTracks timeRange={timeRange} />
-          </TabsContent>
-
-          <TabsContent value="artists" className="space-y-4 focus-visible:outline-none">
-            <TopArtists timeRange={timeRange} />
-          </TabsContent>
-
-          <TabsContent value="albums" className="space-y-4 focus-visible:outline-none">
-            <TopAlbums timeRange={timeRange} />
-          </TabsContent>
-
-          <TabsContent value="saved" className="space-y-4 focus-visible:outline-none">
-            <SavedTracks />
-          </TabsContent>
-
-          <TabsContent value="analytics" className="space-y-4 focus-visible:outline-none">
-            <UserAnalytics />
-            <MusicRecommendations />
-          </TabsContent>
-        </Tabs>
+        <DashboardContent timeRange={timeRange} />
       </div>
     </div>
   );
